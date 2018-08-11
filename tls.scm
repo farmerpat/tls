@@ -201,6 +201,18 @@
           (else (cons (car lat)
                       (multirember atom (cdr lat))))))
 
+  (define (multiinsertR new old lat)
+    (cond ((null? lat) '())
+          ((eq? (car lat) old)
+           (cons old
+                 (cons new
+                       (multiinsertR new old (cdr lat)))))
+          (else (cons (car lat)
+                      (multiinsertR new old (cdr lat))))))
+
+  ;; multiinsertL
+  ;; multisubst
+
   ;; this could/should? be extended to take a
   ;; test-group name as an argument.
   (define run-tests
@@ -376,6 +388,24 @@
         (test-equal "'cup '(coffee cup tea cup and hick cup) equal? '(coffee tea and hick)"
           (multirember 'cup '(coffee cup tea cup and hick cup))
           '(coffee tea and hick)))
+
+      (test-group "**multiinsertR**"
+        (test-equal
+          "'a 'b '() equal? '()"
+          (multiinsertR 'a 'b '())
+          '())
+        (test-equal
+          "'a 'b '(a a c d e f g) equal? '()"
+          (multiinsertR 'a 'b '(a a c d e f g))
+          '(a a c d e f g))
+        (test-equal
+          "'a 'b '(b) equal? '(b a)"
+          (multiinsertR 'a 'b '(b))
+          '(b a))
+        (test-equal
+          "'a 'b '(b b b) equal? '(b a b a b a)"
+          (multiinsertR 'a 'b '(b b b))
+          '(b a b a b a)))
 
       (newline)
       (newline)
