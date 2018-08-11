@@ -59,6 +59,9 @@
 
   (define-syntax test-equal
     (syntax-rules ()
+      ;; if we know that exp1 is a procedure call,
+      ;; should be able to extract the name of the
+      ;; procedure and the arguments.
       ((_ test-name exp1 exp2)
        (begin
          (set! *total-tests-run* (add1 *total-tests-run*))
@@ -172,10 +175,24 @@
   (define (insertL new old lat)
     (cond ((null? lat) '())
           ((eq? (car lat) old)
-           (cons new
-                 (cons old (cdr lat))))
+           (cons new lat))
           (else (cons (car lat)
                       (insertL new old (cdr lat))))))
+
+  (define (subst new old lat)
+    (cond ((null? lat) '())
+          ((eq? (car lat) old)
+           (cons new (cdr lat)))
+          (else (cons (car lat)
+                      (subst new old (cdr lat))))))
+
+  (define (subst2 new old1 old2 lat)
+    (cond ((null? lat) '())
+          ((or (eq? (car lat) old1)
+               (eq? (car lat) old2))
+           (cons new (cdr lat)))
+          (else (cons (car lat)
+                      (subst2 new old1 old2 (cdr lat))))))
 
   ;; this could/should? be extended to take a
   ;; test-group name as an argument.
@@ -281,7 +298,7 @@
         (test-equal "'foo 'bar '() produces '()"
           (insertR 'foo 'bar '()) '())
         (test-equal "'topping 'fudge '(ice cream with fudge for dessert) produces \
-               '(ice cream with fudge topping for desert)"
+               '(ice cream with fudge topping for dessert)"
           (insertR 'topping 'fudge '(ice cream with fudge for dessert))
           '(ice cream with fudge topping for dessert))
         (test-equal "'jalapeno 'and '(tacos tamales and salsa) equal? \
@@ -296,7 +313,7 @@
         (test-equal "'foo 'bar '() produces '()"
           (insertL 'foo 'bar '()) '())
         (test-equal "'topping 'fudge '(ice cream with fudge for dessert) produces \
-               '(ice cream with topping fudge for desert)"
+               '(ice cream with topping fudge for dessert)"
           (insertL 'topping 'fudge '(ice cream with fudge for dessert))
           '(ice cream with topping fudge for dessert))
         (test-equal "'jalapeno 'and '(tacos tamales and salsa) equal? \
@@ -306,6 +323,35 @@
         (test-equal "'e 'd '(a b c d f g d h) equal? '(a b c d e f g d h)"
           (insertL 'e 'd '(a b c d f g d h))
           '(a b c e d f g d h)))
+
+      (test-group "**subst**"
+        (test-equal "'foo 'bar '() equal? '()"
+          (subst 'foo 'bar '())
+          '())
+        (test-equal "'foo 'bar '(bar) equal? '(foo)"
+          (subst 'foo 'bar '(bar))
+          '(foo))
+        (test-equal "'topping 'fudge '(ice cream with fudge for dessert) equal? \
+                     '(ice cream with topping for dessert)"
+          (subst 'topping 'fudge '(ice cream with fudge for dessert))
+          '(ice cream with topping for dessert))
+      )
+
+      (test-group "**subst2**"
+        (test-equal "'a 'b 'c '() equal? '()"
+          (subst2 'a 'b 'c '())
+          '())
+        (test-equal "'vanilla 'chocolate 'banana '(banana ice cream \
+                     with chocolate topping) equal? '(vanilla ice cream \
+                     with chocolate topping)"
+          (subst2 'vanilla 'chocolate 'banana '(banana ice cream with chocolate topping))
+          '(vanilla ice cream with chocolate topping))
+        (test-equal "'a 'b 'c '(a c b d) equal? '(a a b d)"
+          (subst2 'a 'b 'c '(a c b d))
+          '(a a b d))
+        (test-equal "'a 'b 'c '(a d b c) equal? '(a d a c)"
+          (subst2 'a 'b 'c '(a d b c))
+          '(a d a c)))
 
       (newline)
       (newline)
