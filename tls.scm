@@ -194,6 +194,13 @@
           (else (cons (car lat)
                       (subst2 new old1 old2 (cdr lat))))))
 
+  (define (multirember atom lat)
+    (cond ((null? lat) '())
+          ((eq? (car lat) atom)
+           (multirember atom (cdr lat)))
+          (else (cons (car lat)
+                      (multirember atom (cdr lat))))))
+
   ;; this could/should? be extended to take a
   ;; test-group name as an argument.
   (define run-tests
@@ -352,6 +359,23 @@
         (test-equal "'a 'b 'c '(a d b c) equal? '(a d a c)"
           (subst2 'a 'b 'c '(a d b c))
           '(a d a c)))
+
+      (test-group "**multirember**"
+        (test-equal "'a '() equal? '()"
+          (multirember 'a '())
+          '())
+        (test-equal "'a '(a b c) equal? '(b c)"
+          (multirember 'a '(a b c))
+          '(b c))
+        (test-equal "'a '(a b a c a d a) equal? '(b c d)"
+          (multirember 'a '(a b a c a d a))
+          '(b c d))
+        (test-equal "'a '(a a a a a) equal? '()"
+          (multirember 'a '(a a a a a))
+          '())
+        (test-equal "'cup '(coffee cup tea cup and hick cup) equal? '(coffee tea and hick)"
+          (multirember 'cup '(coffee cup tea cup and hick cup))
+          '(coffee tea and hick)))
 
       (newline)
       (newline)
