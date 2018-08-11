@@ -210,7 +210,14 @@
           (else (cons (car lat)
                       (multiinsertR new old (cdr lat))))))
 
-  ;; multiinsertL
+  (define (multiinsertL new old lat)
+    (cond ((null? lat) '())
+          ((eq? (car lat) old)
+           (cons new
+                 (cons old (multiinsertL new old (cdr lat)))))
+          (else (cons (car lat)
+                      (multiinsertL new old (cdr lat))))))
+
   ;; multisubst
 
   ;; this could/should? be extended to take a
@@ -406,6 +413,24 @@
           "'a 'b '(b b b) equal? '(b a b a b a)"
           (multiinsertR 'a 'b '(b b b))
           '(b a b a b a)))
+
+      (test-group "**multiinsertL**"
+        (test-equal
+          "'a 'b '()) equal? '()"
+          (multiinsertL 'a 'b '())
+          '())
+        (test-equal
+          "'a 'b '(a a c d e f g) equal? '(a a c d e f g)"
+          (multiinsertL 'a 'b '(a a c d e f g))
+          '(a a c d e f g))
+        (test-equal
+          "'a 'b '(b) equal? '(a b)"
+          (multiinsertL 'a 'b '(b))
+          '(a b))
+        (test-equal
+          "'a 'b '(b b b) equal? '(a b a b a b)"
+          (multiinsertL 'a 'b '(b b b))
+          '(a b a b a b)))
 
       (newline)
       (newline)
