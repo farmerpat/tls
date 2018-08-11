@@ -96,6 +96,7 @@
            (newline)
            (display test-group-name)
            (display " results:")
+           (newline)
            (display "*total-tests-run*: ")
            (display *total-tests-run*)
            (newline)
@@ -159,6 +160,22 @@
     (cond ((null? lol) '())
           (else (cons (car (car lol))
                       (firsts (cdr lol))))))
+
+  (define (insertR new old lat)
+    (cond ((null? lat) '())
+          ((eq? (car lat) old)
+           (cons (car lat)
+                 (cons new (cdr lat))))
+          (else (cons (car lat)
+                      (insertR new old (cdr lat))))))
+
+  (define (insertL new old lat)
+    (cond ((null? lat) '())
+          ((eq? (car lat) old)
+           (cons new
+                 (cons old (cdr lat))))
+          (else (cons (car lat)
+                      (insertL new old (cdr lat))))))
 
   ;; this could/should? be extended to take a
   ;; test-group name as an argument.
@@ -250,7 +267,45 @@
         (test-equal
           "passing '((peaches bananas pears) (bananas apples) (tangerines)) to firsts produces '(peaches bananas tangerines)"
           (firsts '((peaches bananas pears) (bananas apples) (tangerines)))
-          '(peaches bananas tangerines)))
+          '(peaches bananas tangerines))
+        (test-equal
+          "'((five plums) (four) (eleven green oranges)) produces '(five four eleven)"
+          (firsts '((five plums) (four) (eleven green oranges)))
+          '(five four eleven))
+        (test-equal
+          "'((a b) (c d) (e f)) produces '(a c e)"
+          (firsts '((a b) (c d) (e f)))
+          '(a c e)))
+
+      (test-group "**insertR tests***"
+        (test-equal "'foo 'bar '() produces '()"
+          (insertR 'foo 'bar '()) '())
+        (test-equal "'topping 'fudge '(ice cream with fudge for dessert) produces \
+               '(ice cream with fudge topping for desert)"
+          (insertR 'topping 'fudge '(ice cream with fudge for dessert))
+          '(ice cream with fudge topping for dessert))
+        (test-equal "'jalapeno 'and '(tacos tamales and salsa) equal? \
+                     '(tacos tamales and jalapeno salsa)"
+          (insertR 'jalapeno 'and '(tacos tamales and salsa))
+          '(tacos tamales and jalapeno salsa))
+        (test-equal "'e 'd '(a b c d f g d h) equal? '(a b c d e f g d h)"
+          (insertR 'e 'd '(a b c d f g d h))
+          '(a b c d e f g d h)))
+
+      (test-group "**insertL tests***"
+        (test-equal "'foo 'bar '() produces '()"
+          (insertL 'foo 'bar '()) '())
+        (test-equal "'topping 'fudge '(ice cream with fudge for dessert) produces \
+               '(ice cream with topping fudge for desert)"
+          (insertL 'topping 'fudge '(ice cream with fudge for dessert))
+          '(ice cream with topping fudge for dessert))
+        (test-equal "'jalapeno 'and '(tacos tamales and salsa) equal? \
+                     '(tacos tamales jalapeno and salsa)"
+          (insertL 'jalapeno 'and '(tacos tamales and salsa))
+          '(tacos tamales jalapeno and salsa))
+        (test-equal "'e 'd '(a b c d f g d h) equal? '(a b c d e f g d h)"
+          (insertL 'e 'd '(a b c d f g d h))
+          '(a b c e d f g d h)))
 
       (newline)
       (newline)
