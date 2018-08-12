@@ -218,7 +218,13 @@
           (else (cons (car lat)
                       (multiinsertL new old (cdr lat))))))
 
-  ;; multisubst
+  (define (multisubst new old lat)
+    (cond ((null? lat) '())
+          ((eq? (car lat) old)
+           (cons new
+                 (multisubst new old (cdr lat))))
+          (else (cons (car lat)
+                      (multisubst new old (cdr lat))))))
 
   ;; this could/should? be extended to take a
   ;; test-group name as an argument.
@@ -431,6 +437,28 @@
           "'a 'b '(b b b) equal? '(a b a b a b)"
           (multiinsertL 'a 'b '(b b b))
           '(a b a b a b)))
+
+      (test-group "**multisubst**"
+        (test-equal
+          "'a 'b '() equal? '()"
+          (multisubst 'a 'b '())
+          '())
+        (test-equal
+          "'a 'b '(b) equal? '(a)"
+          (multisubst 'a 'b '(b))
+          '(a))
+        (test-equal
+          "'a 'b '(d d d) equal? '(d d d)"
+          (multisubst 'a 'b '(d d d))
+          '(d d d))
+        (test-equal
+          "'a 'b '(b b b b b b b) equal? '(a a a a a a a)"
+          (multisubst 'a 'b '(b b b b b b b))
+          '(a a a a a a a))
+        (test-equal
+          "'a 'b '(a b c d e f g b) equal? '(a a c d e f g a)"
+          (multisubst 'a 'b '(a a c d e f g a))
+          '(a a c d e f g a)))
 
       (newline)
       (newline)
