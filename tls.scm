@@ -292,6 +292,11 @@
           (else (plus (car tup)
                       (addtup (cdr tup))))))
 
+  (define (times m n)
+    (cond ((= m 0) 0)
+          (else (plus (times (sub1 m) n)
+                      n))))
+
   ;; begin tests
   ;; this could/should? be extended to take a
   ;; test-group name as an argument.
@@ -554,6 +559,12 @@
         (test "'(0 0 0 0 1) eq? 1" (addtup '(0 0 0 0 1)) 1)
         (test "'(1 2 3 4) eq? 1" (addtup '(1 2 3 4)) 10)
         (test "'(20 30 0 0 1 2) eq? 1" (addtup '(20 30 0 0 1 2)) 53))
+
+      (test-group "**times**"
+        (test "1 1 eq? 1" (times 1 1) 1)
+        (test "1 13 eq? 13" (times 1 13) 13)
+        (test "12 12 eq? 144" (times 12 12) 144)
+        (test "6 7 eq? 144" (times 6 7) 42))
 
       (newline)
       (newline)
