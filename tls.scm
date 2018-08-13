@@ -62,6 +62,23 @@
       ;; if we know that exp1 is a procedure call,
       ;; should be able to extract the name of the
       ;; procedure and the arguments.
+      ;; procedure-information can give us some meta
+      ;; info about procedures. for most of them,
+      ;; (excluding, so far, +, -, /, *, and apply)
+      ;; (also (procedure-information map) gives (map-in-order...)
+      ;; on chicken...
+      ;; (procedure-information member?)
+      ;; (member? atom lst)
+      ;; we can get the procedure name
+      ;; and the lambda list
+      ;; if i do something with this (e.g. write a macro/procedure
+      ;; that takes a list of test specifiers (test or test-equal,
+      ;; the function to be tested, and then pairs of the arguments
+      ;; to the function and the expected results)), I may
+      ;; want to stop assuming...well I doubt i would need
+      ;; procedure-information to acheive this, but it could
+      ;; be used to display the mappings from prcoedure arguments
+      ;; to the argument set values
       ((_ test-name exp1 exp2)
        (begin
          (set! *total-tests-run* (add1 *total-tests-run*))
@@ -226,6 +243,56 @@
           (else (cons (car lat)
                       (multisubst new old (cdr lat))))))
 
+  ;; end chapter 3
+  ;; begin things that occurred to me
+  (define (pure-pair? p)
+    (and (pair? p)
+         (not (list? p))
+         (atom? (car p))
+         (atom? (cdr p))))
+
+  ;; in the repl, the following
+  ;; will print a readable expansion
+  ;; of the macro nil!, given the
+  ;; argument foo:
+  ;; (pp (expand '(nil! foo)))
+
+  ;; it is silly to write out the same sort of
+  ;; body all the time...schemes come with
+  ;; (every <predicate> <list>), but lets
+  ;; assume we don't have it
+  (define (every pred? lst)
+    (cond ((null? lst) #t)
+          ((pred? (car lst))
+           (every pred? (cdr lst)))
+          (else #f)))
+
+  ;; list of pure pairs?
+  (define (lopp? lst)
+    (every pure-pair? lst))
+
+  ;; end things that occurred to me
+  ;; begin chapter 4
+  (define (plus m n)
+    (cond ((zero? m) n)
+          (else (add1 (plus (sub1 m) n)))))
+
+  (define (minus m n)
+    (cond ((zero? n) m)
+          (else (sub1 (minus m (sub1 n))))))
+
+  (define (tup? lst)
+    (cond ((null? lst) #t)
+          ((number? (car lst))
+           (tup? (cdr lst)))
+          (else #f)))
+
+  (define (addtup tup)
+    ((cond ((null? tup) 0)
+           (else (plus (car tup)
+                       (addtup (cdr tup)))))))
+
+  ;; begin tests
   ;; this could/should? be extended to take a
   ;; test-group name as an argument.
   (define run-tests
@@ -459,6 +526,27 @@
           "'a 'b '(a b c d e f g b) equal? '(a a c d e f g a)"
           (multisubst 'a 'b '(a a c d e f g a))
           '(a a c d e f g a)))
+
+      (test-group "**plus**"
+        (test "0 0 eq? 0" (plus 0 0) 0)
+        (test "10 0 eq? 10" (plus 10 0) 10)
+        (test "0 10 eq? 10" (plus 0 10) 10)
+        (test "10 10 eq? 20" (plus 10 10) 20)
+        (test "3 11 eq? 20" (plus 3 11) 14))
+
+      (test-group "**minus**"
+        (test "0 0 eq? 0" (minus 0 0) 0)
+        (test "10 0 eq? 10" (minus 10 0) 10)
+        (test "10 10 eq? 0" (minus 10 10) 0)
+        (test "10 9 eq? 1" (minus 10 9) 1)
+        (test "11 3 eq? 8" (minus 11 3) 8))
+
+      (test-group "**tup?**"
+        (test "'() eq? #t" (tup? '()) #t)
+        (test "'(1) eq? #t" (tup? '(1)) #t)
+        (test "'(1 2 3) eq? #t" (tup? '(1 2 3)) #t)
+        (test "'(a) eq? #f" (tup? '(a)) #f)
+        (test "'(1 2 (3) 4) eq? #f" (tup? '(1 2 (3) 4)) #f))
 
       (newline)
       (newline)
