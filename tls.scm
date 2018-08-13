@@ -303,10 +303,19 @@
           (else (cons (plus (car tup1) (car tup2))
                       (tup+ (cdr tup1) (cdr tup2))))))
 
-  (define (their-tup+ tup1 tup2)
-    (cond ((and (null? tup1) (null? tup2)) '())
-          (else (cons (plus (car tup1) (car tup2))
-                      (their-tup+ (cdr tup1) (cdr tup2))))))
+  (define (gt n m)
+    (cond ((zero? n) #f)
+          ((zero? m) #t)
+          (else (gt (sub1 n) (sub1 m)))))
+
+  (define (lt n m)
+    (cond ((zero? m) #f)
+          ((zero? n) #t)
+          (else (lt (sub1 n) (sub1 m)))))
+
+  (define (eq n m)
+    (and (not (gt n m))
+         (not (gt m n))))
 
   ;; begin tests
   ;; this could/should? be extended to take a
