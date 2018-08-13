@@ -297,6 +297,17 @@
           (else (plus (times (sub1 m) n)
                       n))))
 
+  (define (tup+ tup1 tup2)
+    (cond ((null? tup1) tup2)
+          ((null? tup2) tup1)
+          (else (cons (plus (car tup1) (car tup2))
+                      (tup+ (cdr tup1) (cdr tup2))))))
+
+  (define (their-tup+ tup1 tup2)
+    (cond ((and (null? tup1) (null? tup2)) '())
+          (else (cons (plus (car tup1) (car tup2))
+                      (their-tup+ (cdr tup1) (cdr tup2))))))
+
   ;; begin tests
   ;; this could/should? be extended to take a
   ;; test-group name as an argument.
@@ -565,6 +576,16 @@
         (test "1 13 eq? 13" (times 1 13) 13)
         (test "12 12 eq? 144" (times 12 12) 144)
         (test "6 7 eq? 144" (times 6 7) 42))
+
+      (test-group "**tup+**"
+        (test-equal
+          "'(3 6 9 11 4) '(8 5 2 0 7) equal? '(11 11 11 11 11)"
+          (tup+ '(3 6 9 11 4) '(8 5 2 0 7))
+          '(11 11 11 11 11))
+        (test-equal
+          "'() '() equal? '()"
+          (tup+ '() '())
+          '()))
 
       (newline)
       (newline)
