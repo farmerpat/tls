@@ -288,9 +288,9 @@
           (else #f)))
 
   (define (addtup tup)
-    ((cond ((null? tup) 0)
-           (else (plus (car tup)
-                       (addtup (cdr tup)))))))
+    (cond ((null? tup) 0)
+          (else (plus (car tup)
+                      (addtup (cdr tup))))))
 
   ;; begin tests
   ;; this could/should? be extended to take a
@@ -547,6 +547,13 @@
         (test "'(1 2 3) eq? #t" (tup? '(1 2 3)) #t)
         (test "'(a) eq? #f" (tup? '(a)) #f)
         (test "'(1 2 (3) 4) eq? #f" (tup? '(1 2 (3) 4)) #f))
+
+      (test-group "**addtup**"
+        (test "'() eq? 0" (addtup '()) 0)
+        (test "'(1) eq? 1" (addtup '(1)) 1)
+        (test "'(0 0 0 0 1) eq? 1" (addtup '(0 0 0 0 1)) 1)
+        (test "'(1 2 3 4) eq? 1" (addtup '(1 2 3 4)) 10)
+        (test "'(20 30 0 0 1 2) eq? 1" (addtup '(20 30 0 0 1 2)) 53))
 
       (newline)
       (newline)
