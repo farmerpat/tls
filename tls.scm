@@ -273,6 +273,7 @@
 
   ;; end things that occurred to me
   ;; begin chapter 4
+  ;; non-negative integers are assumed.
   (define (plus m n)
     (cond ((zero? m) n)
           (else (add1 (plus (sub1 m) n)))))
@@ -303,6 +304,8 @@
           (else (cons (plus (car tup1) (car tup2))
                       (tup+ (cdr tup1) (cdr tup2))))))
 
+  ;; there are no tests from here on out for right now.
+  ;; it would probably be a good idea to write them tho.
   (define (gt n m)
     (cond ((zero? n) #f)
           ((zero? m) #t)
@@ -316,6 +319,14 @@
   (define (eq n m)
     (and (not (gt n m))
          (not (gt m n))))
+
+  (define (^ n m)
+    (cond ((zero? m) 1)
+          (else (* n (^ n (sub1 m))))))
+
+  (define (div n m)
+    (cond ((lt n m) 0)
+          (else (add1 (div (minus n m) m)))))
 
   ;; begin tests
   ;; this could/should? be extended to take a
