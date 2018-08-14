@@ -328,6 +328,69 @@
     (cond ((lt n m) 0)
           (else (add1 (div (minus n m) m)))))
 
+  (define (len lat)
+    (cond ((null? lat) 0)
+          (else (add1 (len (cdr lat))))))
+
+  ;; => (pick 3 '(lasagna spaghetti ravioli macaroni meatball))
+  ;; macaroni
+  (define (pick n lat)
+    (cond ((eq 1 n) (car lat))
+          (else (pick (sub1 n) (cdr lat)))))
+
+  (define (one? n)
+    (eq 1 n))
+
+  (define (rempick n lat)
+    (cond ((one? n) (cdr lat))
+          (else (cons (car lat)
+                      (rempick (sub1 n) (cdr lat))))))
+
+  ;; the book didn't tell me to do this,
+  ;; but this works for unquoted strings,
+  ;; numbers, symbols, and lists
+  (define (num? n)
+    (and (atom? n)
+         ;; not sure why I thought this might
+         ;; be true for numbers, but it is (in
+         ;; chicken at least)
+         (eq? (quote n) n)))
+
+  (define (no-nums lat)
+    (cond ((null? lat) '())
+          ((number? (car lat))
+           (no-nums (cdr lat)))
+          (else (cons (car lat)
+                      (no-nums (cdr lat))))))
+
+  (define (all-nums lat)
+    (cond ((null? lat) '())
+          ((number? (car lat))
+           (cons (car lat)
+                 (all-nums (cdr lat))))
+           (else (all-nums (cdr lat)))))
+
+  ;;these last two functions end chapter 4.
+  ;; true iff a1 and a2 are the same atom.
+  ;; use eq for numbers and eq? for everything
+  ;; else
+  (define (equan? a1 a2)
+    (cond ((and (number? a1)
+                (number? a2))
+           (eq a1 a2))
+          ;; they added this line
+          ((or (number? a1) (number? a2)) #f)
+          (else (eq? a1 a2))))
+
+  ;; counts the number of
+  ;; times atom a occurs in lat.
+  ;; use use eq?
+  (define (occur a lat)
+    (cond ((null? lat) 0)
+          ((eq? (car lat) a)
+           (add1 (occur a (cdr lat))))
+          (else (occur a (cdr lat)))))
+
   ;; begin tests
   ;; this could/should? be extended to take a
   ;; test-group name as an argument.
