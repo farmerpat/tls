@@ -384,12 +384,46 @@
 
   ;; counts the number of
   ;; times atom a occurs in lat.
-  ;; use use eq?
   (define (occur a lat)
     (cond ((null? lat) 0)
           ((eq? (car lat) a)
            (add1 (occur a (cdr lat))))
           (else (occur a (cdr lat)))))
+
+  ;; => (rember* 'cup '((coffee) cup ((tea) cup) (and (hick)) cup))
+  ;; ((coffee) ((tea)) (and (hick)))
+  ;; => (rember*
+  ;;     'sauce
+  ;;     '(((tomato sauce)) ((bean) sauce) (and ((flying)) sauce)))
+  ;; (((tomato)) ((bean)) (and ((flying))))
+  (define (rember* atom lst)
+    (cond ((null? lst) '())
+          ;; they tested for atom? instead...
+          ((list? (car lst))
+           (cons (rember* atom (car lst))
+                 (rember* atom (cdr lst))))
+          ((eq? (car lst) atom)
+           (rember* atom (cdr lst)))
+          (else (cons (car lst)
+                      (rember* atom (cdr lst))))))
+
+  ;; => (insertR*
+  ;;     'roast
+  ;;     'chuck
+  ;;     '((how much (wood)) could ((a (wood) chuck)) (((chuck))) (if (a) ((wood chuck))) could chuck wood))
+  ;;((how much (wood)) could ((a (wood) chuck roast)) (((chuck roast))) (if (a) ((wood chuck roast))) could chuck roast wood)
+  (define (insertR* new old lst)
+    (cond ((null? lst) '())
+          ((atom? (car lst))
+           (cond ((eq? (car lst) old)
+                  (cons old
+                        (cons new (insertR* new old (cdr lst)))))
+                 (else (cons (car lst)
+                             (insertR* new old (cdr lst))))))
+          (else (cons (insertR* new old (car lst))
+                      (insertR* new old (cdr lst))))))
+
+  (define (occur* atom lst) '())
 
   ;; begin tests
   ;; this could/should? be extended to take a
