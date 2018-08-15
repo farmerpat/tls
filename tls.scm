@@ -461,6 +461,15 @@
           (else (cons (insertL* new old (car lst))
                       (insertL* new old (cdr lst))))))
 
+  (define (member* atom lst)
+    (cond ((null? lst) #f)
+          ((atom? (car lst))
+           ;; they used an or here instead of cond/else
+           (cond ((eq? (car lst) atom) #t)
+                 (else (member* atom (cdr lst)))))
+          (else (or (member* atom (car lst))
+                    (member* atom (cdr lst))))))
+
   ;; begin tests
   ;; this could/should? be extended to take a
   ;; test-group name as an argument.
