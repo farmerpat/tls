@@ -423,7 +423,32 @@
           (else (cons (insertR* new old (car lst))
                       (insertR* new old (cdr lst))))))
 
-  (define (occur* atom lst) '())
+  ;; these have the same shape, and this
+  ;; could be abstracted away s.t. a procedure
+  ;; is leveraged. whereby that procedure generates
+  ;; a procedure to be called by another procedure
+  ;; with the same shape...i think this might have
+  ;; to be a macro becase we need to prevent
+  ;; evaluation of the predicate? and the bodies
+  (define (occur* atom lst)
+    (cond ((null? lst) 0)
+          ((atom? (car lst))
+           (cond ((eq? (car lst) atom)
+                  (add1 (occur* atom (cdr lst))))
+                 (else (occur* atom (cdr lst)))))
+          (else (plus (occur* atom (car lst))
+                      (occur* atom (cdr lst))))))
+
+  (define (subst* new old lst)
+    (cond ((null? lst) '())
+          ((atom? (car lst))
+           (cond ((eq? (car lst) old)
+                  (cons new
+                        (subst* new old (cdr lst))))
+                 (else (cons (car lst)
+                             (subst* new old (cdr lst))))))
+          (else (cons (subst* new old (car lst))
+                      (subst* new old (cdr lst))))))
 
   ;; begin tests
   ;; this could/should? be extended to take a
