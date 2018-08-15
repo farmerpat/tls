@@ -450,6 +450,17 @@
           (else (cons (subst* new old (car lst))
                       (subst* new old (cdr lst))))))
 
+  (define (insertL* new old lst)
+    (cond ((null? lst) '())
+          ((atom? (car lst))
+           (cond ((eq? (car lst) old)
+                  (cons new
+                        (cons old (insertL* new old (cdr lst)))))
+                 (else (cons (car lst)
+                             (insertL* new old (cdr lst))))))
+          (else (cons (insertL* new old (car lst))
+                      (insertL* new old (cdr lst))))))
+
   ;; begin tests
   ;; this could/should? be extended to take a
   ;; test-group name as an argument.
