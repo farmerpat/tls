@@ -470,6 +470,13 @@
           (else (or (member* atom (car lst))
                     (member* atom (cdr lst))))))
 
+  ;; finds the leftmost atom in
+  ;; a non-empty list of sexps that
+  ;; does not contain the empty list
+  (define (leftmost lst)
+    (cond ((atom? (car lst)) (car lst))
+          (else (leftmost (car lst)))))
+
   ;; begin tests
   ;; this could/should? be extended to take a
   ;; test-group name as an argument.
