@@ -1,5 +1,62 @@
-(module tls *
-  (import (except scheme member map))
+(library (tls (0 0 1))
+  (export
+    atom?
+    add1
+    sub1
+    lat?
+    member?
+    rember
+    lol?
+    firsts
+    insertR
+    insertL
+    subst
+    subst2
+    multirember
+    multiinsertR
+    multiinsertL
+    multisubst
+    pure-pair?
+    every
+    lopp?
+    plus
+    minus
+    tup?
+    addtup
+    times
+    tup+
+    gt
+    lt
+    eq
+    ^
+    div
+    len
+    pick
+    one?
+    rempick
+    num?
+    no-nums
+    all-nums
+    equan?
+    occur
+    rember*
+    insertR*
+    occur*
+    subst*
+    insertL*
+    member*
+    leftmost
+    run-tests)
+  (import
+    (except
+      (scheme)
+      member
+      map
+      atom?
+      add1
+      sub1
+      subst
+      div))
 
   (define *total-tests-run* 0)
   (define *total-tests-run-global* 0)
@@ -47,13 +104,13 @@
          (newline)
          (if (assert-eq exp1 exp2)
              (begin
-               (define *total-tests-passed* (add1 *total-tests-passed*))
-               (define *total-tests-passed-global* (add1 *total-tests-passed-global*))
+               (set! *total-tests-passed* (add1 *total-tests-passed*))
+               (set! *total-tests-passed-global* (add1 *total-tests-passed-global*))
                (display "...PASSED")
                (newline))
              (begin
-               (define *total-tests-failed* (add1 *total-tests-failed*))
-               (define *total-tests-failed-global* (add1 *total-tests-failed-global*))
+               (set! *total-tests-failed* (add1 *total-tests-failed*))
+               (set! *total-tests-failed-global* (add1 *total-tests-failed-global*))
                (display "...FAILED")
                (newline)))))))
 
@@ -88,13 +145,13 @@
          (newline)
          (if (assert-equal exp1 exp2)
              (begin
-               (define *total-tests-passed* (add1 *total-tests-passed*))
-               (define *total-tests-passed-global* (add1 *total-tests-passed-global*))
+               (set! *total-tests-passed* (add1 *total-tests-passed*))
+               (set! *total-tests-passed-global* (add1 *total-tests-passed-global*))
                (display "...PASSED")
                (newline))
              (begin
-               (define *total-tests-failed* (add1 *total-tests-failed*))
-               (define *total-tests-failed-global* (add1 *total-tests-failed-global*))
+               (set! *total-tests-failed* (add1 *total-tests-failed*))
+               (set! *total-tests-failed-global* (add1 *total-tests-failed-global*))
                (display "...FAILED")
                (newline)))))))
 
@@ -102,9 +159,9 @@
     (syntax-rules ()
       ((_ test-group-name a-test ...)
        (begin
-         (define *total-tests-run* 0)
-         (define *total-tests-passed* 0)
-         (define *total-tests-failed* 0)
+         (set! *total-tests-run* 0)
+         (set! *total-tests-passed* 0)
+         (set! *total-tests-failed* 0)
 
          (newline)
          (display "entering test group ")
