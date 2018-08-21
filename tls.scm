@@ -46,6 +46,9 @@
     insertL*
     member*
     leftmost
+    eqlist?
+    simplified-eq-list?
+    equal?
     run-tests)
   (import
     (except
@@ -53,6 +56,7 @@
       member
       map
       atom?
+      equal?
       add1
       sub1
       subst
@@ -425,7 +429,7 @@
           ((number? (car lat))
            (cons (car lat)
                  (all-nums (cdr lat))))
-           (else (all-nums (cdr lat)))))
+          (else (all-nums (cdr lat)))))
 
   ;;these last two functions end chapter 4.
   ;; true iff a1 and a2 are the same atom.
@@ -534,6 +538,43 @@
     (cond ((atom? (car lst)) (car lst))
           (else (leftmost (car lst)))))
 
+  (define eqlist?
+    (lambda (l1 l2)
+      (cond ((and (null? l1)
+                  (not (null? l2)))
+             #f)
+            ((and (null? l2)
+                  (not (null? l1)))
+             #f)
+            ((and (null? l1)
+                  (null? l2))
+             #t)
+            ;; else the lists still have elements
+            (else (cond ((and (list? (car l1))
+                              (list? (car l2)))
+                         (and (eqlist? (car l1) (car l2))
+                              (eqlist? (cdr l1) (cdr l2))))
+                        ((and (atom? (car l1))
+                              (atom? (car l2)))
+                         (and (equan? (car l1) (car l2))
+                              (eqlist? (cdr l1) (cdr l2))))
+                        (else #f))))))
+
+  (define equal?
+    (lambda (s1 s2)
+      (cond ((and (atom? s1) (atom? s2))
+             (equan? s1 s2))
+            ((or (atom? s1) (atom? s2)) #f)
+            (else (eqlist? s1 s2)))))
+
+  (define simplified-eq-list?
+    (lambda (l1 l2)
+      (cond ((and (null? l1) (null? l2)) #t)
+            ((or (null? l1) (null? l2)) #f)
+            (else
+              (and (equal? (car l1) (car l2))
+                   (eqlist? (car l1) (cdr l2)))))))
+
   ;; begin tests
   ;; this could/should? be extended to take a
   ;; test-group name as an argument.
@@ -617,8 +658,9 @@
       (test-group "**firsts tests***"
         (test "passing '() to firsts produces '()"
               (firsts '()) '())
-        (test-equal "passing '((apples)) to firsts produces '(apples)"
-              (firsts '((apples))) '(apples))
+        (test-equal
+          "passing '((apples)) to firsts produces '(apples)"
+          (firsts '((apples))) '(apples))
         (test-equal
           "passing '((peaches pears) (apples)) to firsts produces '(peaches apples)"
           (firsts '((peaches pears) (apples))) '(peaches apples))
@@ -675,8 +717,7 @@
         (test-equal "'topping 'fudge '(ice cream with fudge for dessert) equal? \
                      '(ice cream with topping for dessert)"
           (subst 'topping 'fudge '(ice cream with fudge for dessert))
-          '(ice cream with topping for dessert))
-      )
+          '(ice cream with topping for dessert)))
 
       (test-group "**subst2**"
         (test-equal "'a 'b 'c '() equal? '()"
@@ -826,5 +867,4 @@
       (display "*total-tests-failed-global*: ")
       (display *total-tests-failed-global*)
       (newline)
-      (newline)))
-)
+      (newline))))
