@@ -49,6 +49,8 @@
     eqlist?
     simplified-eq-list?
     equal?
+    numbered?
+    value
     run-tests)
   (import
     (except
@@ -574,6 +576,34 @@
             (else
               (and (equal? (car l1) (car l2))
                    (eqlist? (car l1) (cdr l2)))))))
+
+  (define (numbered? aexp)
+    (cond ((atom? aexp) (number? aexp))
+          ((eq? (cadr aexp) '+)
+           (and (numbered? (car aexp))
+                (numbered? (caddr aexp))))
+          ((eq? (cadr aexp) 'x)
+           (and (numbered? (car aexp))
+                (numbered? (caddr aexp))))
+          ((eq? (cadr aexp) '^)
+           (and (numbered? (car aexp))
+                (numbered? (caddr aexp))))
+          (else #f)))
+
+  ;; book claims we can simplify, but their
+  ;; simplification doesn't check for +,*,^...
+  (define (value nexp)
+    (cond ((atom? nexp) nexp)
+          ((eq? (cadr nexp) '+)
+           (+ (value (car nexp))
+              (value (caddr nexp))))
+          ((eq? (cadr nexp) '*)
+           (* (value (car nexp))
+              (value (caddr nexp))))
+          ((eq? (cadr nexp) '^)
+           (^ (value (car nexp))
+              (value (caddr nexp))))
+          (else (error "value" "unrecognized operator" (car nexp)))))
 
   ;; begin tests
   ;; this could/should? be extended to take a
