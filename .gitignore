@@ -2,3 +2,4 @@ tls
 *.import.scm
 *.o
 scratch.scm
+tags
