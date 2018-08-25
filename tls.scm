@@ -645,6 +645,19 @@
       m
       (tally-add1 (tally-+ (tally-sub1 n) m))))
 
+  ;; begin chapter 7
+  (define (set? lat)
+    (cond ((null? lat) #t)
+          ((member? (car lat) (cdr lat)) #f)
+          (else (set? (cdr lat)))))
+
+  (define (makeset lat)
+    (cond ((null? lat) '())
+          ((member? (car lat) (cdr lat))
+           (cons (car lat)
+                 (makeset (multirember (car lat) (cdr lat)))))
+          (else (cons (car lat)
+                      (makeset (cdr lat))))))
   ;; begin tests
   ;; this could/should? be extended to take a
   ;; test-group name as an argument.
