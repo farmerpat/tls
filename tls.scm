@@ -640,6 +640,11 @@
         (cdr n))
       (error "tally-sub1" "NaN" n)))
 
+  (define (tally-+ n m)
+    (if (tally-zero? n)
+      m
+      (tally-add1 (tally-+ (tally-sub1 n) m))))
+
   ;; begin tests
   ;; this could/should? be extended to take a
   ;; test-group name as an argument.
