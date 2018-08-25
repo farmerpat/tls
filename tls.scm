@@ -605,6 +605,41 @@
               (value (caddr nexp))))
           (else (error "value" "unrecognized operator" (car nexp)))))
 
+  (define (prefix-value nexp)
+    (cond ((atom? nexp) nexp)
+          ((eq? (car nexp) '+)
+           (+ (prefix-value (cadr nexp))
+              (prefix-value (caddr nexp))))
+          ((eq? (car nexp) '*)
+           (* (prefix-value (cadr nexp))
+              (prefix-value (caddr nexp))))
+          ((eq? (car nexp) '^)
+           (^ (prefix-value (cadr nexp))
+              (prefix-value (caddr nexp))))
+          (else (error "prefix-value" "unrecognized operator" (cadr nexp)))))
+
+  (define (tally-number? n)
+    (if (null? n)
+      #t
+      (and (list? n)
+           (eq? (car n) '())
+           (tally-number? (cdr n)))))
+
+  (define (tally-zero? n)
+    (null? n))
+
+  (define (tally-add1 n)
+    (if (tally-number? n)
+      (cons '() n)
+      (error "tally-add1" "NaN" n)))
+
+  (define (tally-sub1 n)
+    (if (tally-number? n)
+      (if (null? n)
+        n
+        (cdr n))
+      (error "tally-sub1" "NaN" n)))
+
   ;; begin tests
   ;; this could/should? be extended to take a
   ;; test-group name as an argument.
