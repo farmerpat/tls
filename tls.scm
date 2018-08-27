@@ -51,6 +51,10 @@
     equal?
     numbered?
     value
+    set?
+    makeset
+    subset?
+    eqset?
     run-tests)
   (import
     (except
@@ -658,6 +662,24 @@
                  (makeset (multirember (car lat) (cdr lat)))))
           (else (cons (car lat)
                       (makeset (cdr lat))))))
+
+  (define (subset? set1 set2)
+    (if (null? set1)
+      #t
+      (and (member? (car set1) set2)
+                     (subset? (cdr set1) set2))))
+
+  (define (my-eqset? set1 set2)
+    (if (and (null? set1) (null? set2))
+      #t
+      (and (member? (car set1) set2)
+           (eqset? (cdr set1) (rember (car set1) set2)))))
+
+  ;; theirs
+  (define (eqset? set1 set2)
+    (and (subset? set1 set2)
+         (subset? set2 set1)))
+
   ;; begin tests
   ;; this could/should? be extended to take a
   ;; test-group name as an argument.
